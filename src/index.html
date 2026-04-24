@@ -1,11 +1,608 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus</title>
-    </head>
-    <body>
-        Hello World
-    </body>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>党员发展全流程自查系统 | 待办任务提醒</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f2f5;
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans', system-ui, sans-serif;
+            padding: 30px 24px 50px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+            padding: 18px 28px;
+            color: white;
+        }
+
+        .card-header h2 {
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+
+        .card-header p {
+            opacity: 0.85;
+            font-size: 0.9rem;
+            margin-top: 6px;
+        }
+
+        .form-grid {
+            padding: 28px 28px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+            background: #ffffff;
+            border-bottom: 1px solid #eef2f6;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 170px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #334155;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            background: #fefefe;
+            transition: 0.2s;
+            outline: none;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+        }
+
+        .btn-submit {
+            background: #b91c1c;
+            color: white;
+            border: none;
+            padding: 10px 26px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-submit:hover {
+            background: #991b1b;
+        }
+
+        .error-message {
+            margin: 12px 28px 0 28px;
+            padding: 12px 18px;
+            background: #fee2e2;
+            border-left: 5px solid #dc2626;
+            color: #991b1b;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .timeline-flow {
+            padding: 20px 28px 20px;
+            background: #fef9f5;
+            border-bottom: 1px solid #ffe6e0;
+        }
+
+        .flow-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #7f1a1a;
+            flex-wrap: wrap;
+        }
+
+        .flow-steps {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .step-node {
+            flex: 1;
+            min-width: 110px;
+            background: white;
+            border-radius: 28px;
+            padding: 14px 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-top: 4px solid #cbd5e1;
+            transition: 0.2s;
+        }
+
+        .step-node.completed {
+            border-top-color: #16a34a;
+            background: #f0fdf4;
+        }
+        .step-node.current {
+            border-top-color: #dc2626;
+            background: #fff0ed;
+            box-shadow: 0 6px 12px rgba(220,38,38,0.1);
+        }
+        .step-node.pending {
+            border-top-color: #94a3b8;
+            opacity: 0.7;
+        }
+        .step-node .step-name {
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: #1e293b;
+        }
+        .step-node .step-date {
+            font-size: 0.7rem;
+            color: #475569;
+            margin-top: 6px;
+            font-family: monospace;
+        }
+
+        .reminder-section {
+            background: #fefce8;
+            margin: 0 24px 24px 24px;
+            border-radius: 24px;
+            padding: 20px;
+            border-left: 6px solid #eab308;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .reminder-title {
+            font-weight: 800;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #854d0e;
+            margin-bottom: 16px;
+        }
+        .reminder-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .reminder-item {
+            background: white;
+            border-radius: 20px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #fde68a;
+        }
+        .reminder-icon {
+            font-size: 1.4rem;
+        }
+        .reminder-content {
+            flex: 1;
+        }
+        .reminder-desc {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .reminder-deadline {
+            font-size: 0.75rem;
+            color: #b45309;
+            margin-top: 6px;
+            font-family: monospace;
+            background: #fffbeb;
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+
+        .report-section {
+            background: #f8fafc;
+            margin: 0 24px 24px 24px;
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        .report-title {
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-left: 4px solid #dc2626;
+            padding-left: 12px;
+        }
+        .report-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .report-item {
+            background: white;
+            border-radius: 16px;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+        }
+        .report-date {
+            font-family: monospace;
+            font-weight: 600;
+            color: #b91c1c;
+        }
+        .report-note {
+            font-size: 0.75rem;
+            color: #2c5f2d;
+            background: #e6f7e6;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        .table-wrapper {
+            padding: 0 24px 28px;
+            overflow-x: auto;
+        }
+
+        .responsibility-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .responsibility-table th {
+            background: #fef2f2;
+            color: #7f1a1a;
+            padding: 12px 10px;
+            font-weight: 700;
+            border-bottom: 2px solid #fecaca;
+            text-align: center;
+        }
+
+        .responsibility-table td {
+            border: 1px solid #f0e2e0;
+            padding: 12px 10px;
+            vertical-align: top;
+            background: white;
+        }
+
+        .status-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: #e2e3e5;
+            margin-left: 6px;
+        }
+        .status-done { background: #dcfce7; color: #166534; }
+        .status-todo { background: #fee2e2; color: #b91c1c; }
+
+        .info-placeholder {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+            background: #f8fafc;
+            border-radius: 24px;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #5b6e8c;
+            margin-top: 20px;
+        }
+        @media (max-width: 760px) {
+            body { padding: 16px; }
+            .form-grid { flex-direction: column; }
+            .step-node { min-width: 80px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h2>📌 党员发展 · 阶段自查与待办提醒系统</h2>
+            <p>智能生成“什么时间做什么事”待办清单，严格校验积极分子6个月、发展对象1年等时限</p>
+        </div>
+        <div class="form-grid">
+            <div class="input-group"><label>👤 姓名</label><input type="text" id="userName" value="李华"></div>
+            <div class="input-group"><label>📌 当前所处阶段</label>
+                <select id="currentStage">
+                    <option value="apply">仅递交入党申请（未确定积极分子）</option>
+                    <option value="active" selected>积极分子阶段（已备案）</option>
+                    <option value="develop">发展对象阶段（已确定）</option>
+                    <option value="preparty">预备党员阶段（已接收）</option>
+                    <option value="transfer">预备党员转正后（已转正）</option>
+                </select>
+            </div>
+            <div class="input-group"><label>📅 申请入党时间 *</label><input type="date" id="applyDate" value="2023-03-15"></div>
+            <div class="input-group" id="activeDateGroup"><label>⭐ 积极分子确定时间</label><input type="date" id="activeDate" placeholder="如已确定则填写"></div>
+            <div class="input-group" id="developDateGroup" style="display:none"><label>📌 发展对象确定时间</label><input type="date" id="developDate" placeholder="如已列为发展对象填写"></div>
+            <div class="input-group" id="prepartyDateGroup" style="display:none"><label>📜 预备党员接收时间</label><input type="date" id="prepartyDate" placeholder="支部大会通过日期"></div>
+            <div class="input-group"><label>🎭 责任清单视角</label>
+                <select id="roleSelect"><option value="本人">本人（申请人/党员）</option><option value="支部">党支部（支委会）</option><option value="党委">党委（上级党组织）</option></select>
+            </div>
+            <div class="input-group"><button class="btn-submit" id="refreshBtn">🔄 生成清单 & 待办提醒</button></div>
+        </div>
+        <div id="errorContainer" class="error-message" style="display:none"></div>
+
+        <div class="timeline-flow"><div class="flow-title"><span>📅 截止当前阶段 · 发展时间轴</span></div><div class="flow-steps" id="flowStepsContainer"></div></div>
+
+        <!-- 待办任务提醒卡片 -->
+        <div id="reminderArea" class="reminder-section" style="display:none;">
+            <div class="reminder-title">⏰ 待办任务提醒 · 必须按时完成</div>
+            <div id="reminderListContainer" class="reminder-list"></div>
+        </div>
+
+        <!-- 思想汇报计划区（仅本人） -->
+        <div id="reportArea" class="report-section" style="display:none;">
+            <div class="report-title">📝 思想汇报提交计划（每季度至少一篇）</div>
+            <div id="reportListContainer" class="report-list"></div>
+        </div>
+
+        <div class="table-wrapper" id="tableContainer"><div class="info-placeholder">填写信息并选择身份，系统自动生成待办及清单</div></div>
+    </div>
+    <footer>✓ 待办任务依据《细则》时限生成，节假日自动顺延；思想汇报每季度一次，避开周末/法定假日。</footer>
+</div>
+
+<script>
+    // 责任清单数据 (本人/支部/党委)
+    const selfDuty = [
+        { stage: "一、申请入党", timeNode: "随时", action: "1. 年满18周岁，自愿递交书面入党申请书。<br>2. 如实汇报个人基本情况、成长经历、家庭情况等。" },
+        { stage: "二、入党积极分子培养教育", timeNode: "确定为积极分子后", action: "1. 接受培养联系人教育帮助。<br>2. 每季度至少提交1篇思想汇报。<br>3. 参加党课、党内活动及分配的社会工作。<br>4. 工作单位变动及时报告。" },
+        { stage: "三、发展对象考察", timeNode: "列为发展对象后", action: "1. 配合政治审查，如实提供情况。<br>2. 参加短期集中培训（不少于3天或24学时）。<br>3. 配合入党介绍人考察。" },
+        { stage: "四、预备党员接收", timeNode: "支部大会讨论前", action: "1. 认真填写《中国共产党入党志愿书》。<br>2. 参加支部大会，汇报对党的认识等。<br>3. 回答党员提问。" },
+        { stage: "五、预备党员转正", timeNode: "预备期内（1年）", action: "1. 按时参加组织生活。<br>2. 参加入党宣誓仪式。<br>3. 预备期满前一周提交转正申请。<br>4. 支部大会汇报思想工作。<br>5. 转正后配合归档材料。" }
+    ];
+    const branchDuty = [
+        { stage: "一、申请入党", timeNode: "收到申请书1个月内", action: "1. 派委员同申请人谈话。<br>2. 建立培养期档案。" },
+        { stage: "二、入党积极分子培养教育", timeNode: "申请人递交申请6个月后", action: "1. 组织“双推”。<br>2. 支委会确定积极分子并公示7天。<br>3. 报上级党委备案。<br>4. 指定2名培养联系人。<br>5. 每半年考察一次。<br>6. 安排听党课等活动。" },
+        { stage: "三、发展对象考察", timeNode: "积极分子满1年以上", action: "1. 听取意见确定发展对象人选。<br>2. 公示7天并报备案。<br>3. 确定入党介绍人。<br>4. 政治审查。<br>5. 组织集中培训。" },
+        { stage: "四、预备党员接收", timeNode: "预审合格后", action: "1. 支委会预审报党委。<br>2. 指导填写《入党志愿书》。<br>3. 召开支部大会无记名投票。<br>4. 决议报党委审批。<br>5. 通知本人并宣布。" },
+        { stage: "五、预备党员转正", timeNode: "预备期满前", action: "1. 编入党小组。<br>2. 组织入党宣誓。<br>3. 继续教育考察。<br>4. 收到转正申请后审查并召开支部大会。<br>5. 报党委审批，归档材料。" }
+    ];
+    const committeeDuty = [
+        { stage: "一、申请入党", timeNode: "无", action: "（本阶段党委一般不直接参与）" },
+        { stage: "二、入党积极分子培养教育", timeNode: "党支部上报后", action: "1. 对积极分子备案审查。<br>2. 每年分析队伍状况，研究发展计划。" },
+        { stage: "三、发展对象考察", timeNode: "党支部上报后", action: "1. 备案发展对象并书面批复。<br>2. 组织短期集中培训。<br>3. 指导政治审查。" },
+        { stage: "四、预备党员接收", timeNode: "党支部上报后", action: "1. 审查预审材料，1个月内完成预审发志愿书。<br>2. 指派委员/组织员谈话。<br>3. 党委会集体讨论审批预备党员（3个月内，最长不超6个月）。<br>4. 书面通知党支部。<br>5. 审批后7个工作日内备案。" },
+        { stage: "五、预备党员转正", timeNode: "党支部上报后", action: "1. 审查转正决议，3个月内审批。<br>2. 集体讨论逐个表决。<br>3. 对转入预备党员严格审查。<br>4. 指导归档党员材料。" }
+    ];
+
+    const stageOrder = ["apply", "active", "develop", "preparty", "transfer"];
+    const stageNames = { apply:"申请入党", active:"积极分子", develop:"发展对象", preparty:"预备党员", transfer:"已转正" };
+
+    function formatDate(date) { if(!date || isNaN(date.getTime())) return null; let y=date.getFullYear(), m=String(date.getMonth()+1).padStart(2,'0'), d=String(date.getDate()).padStart(2,'0'); return `${y}-${m}-${d}`; }
+    function parseDate(str) { if(!str) return null; let d=new Date(str); return isNaN(d.getTime())?null:d; }
+    function addDays(date, days) { let nd=new Date(date); nd.setDate(nd.getDate()+days); return nd; }
+    function isWeekend(date) { let day=date.getDay(); return day===0 || day===6; }
+    function isHoliday(date) { let m=date.getMonth()+1, d=date.getDate(); if(m===1 && d===1) return true; if(m===5 && d===1) return true; if(m===10 && d>=1 && d<=3) return true; if(m===4 && (d===4||d===5)) return true; return false; }
+    function adjustWorkday(date) { let newDate=new Date(date); while(isWeekend(newDate) || isHoliday(newDate)) newDate.setDate(newDate.getDate()+1); return newDate; }
+
+    // 生成待办提醒 (核心新增)
+    function generateReminders(role, currentStage, applyDateObj, activeDateObj, developDateObj, prepartyDateObj) {
+        let reminders = [];
+        const today = new Date();
+        if(!applyDateObj) return reminders;
+        // 通用: 申请入党谈话 (支部视角)
+        if(role === '支部' && currentStage !== 'transfer') {
+            let talkDeadline = addDays(applyDateObj, 30);
+            let adjTalk = adjustWorkday(talkDeadline);
+            if(adjTalk >= today || true) reminders.push({ icon:"🗣️", desc:"与申请人谈话，了解基本情况", deadline:`建议在 ${formatDate(adjTalk)} 前完成 (收到申请书1个月内)` });
+        }
+        // 积极分子阶段提醒
+        if(role === '支部' && (currentStage === 'active' || currentStage === 'develop' || currentStage === 'preparty')) {
+            if(activeDateObj) {
+                let pushDeadline = addDays(activeDateObj, 7);
+                reminders.push({ icon:"📢", desc:"将积极分子名单报上级党委备案", deadline:`应在确定为积极分子后7日内，建议 ${formatDate(adjustWorkday(pushDeadline))} 前完成` });
+            } else if(applyDateObj) {
+                let suggestActive = new Date(applyDateObj); suggestActive.setMonth(suggestActive.getMonth()+6);
+                reminders.push({ icon:"⚠️", desc:"尚未填写积极分子确定时间，请尽快按照流程确定积极分子", deadline:`建议最早确定日期：${formatDate(adjustWorkday(suggestActive))}` });
+            }
+        }
+        // 发展对象阶段: 政治审查、培训
+        if(role === '支部' && (currentStage === 'develop' || currentStage === 'preparty') && activeDateObj) {
+            let minDevelop = new Date(activeDateObj); minDevelop.setFullYear(minDevelop.getFullYear()+1);
+            reminders.push({ icon:"🔍", desc:"对发展对象进行政治审查，形成结论性材料", deadline:`积极分子满1年之后即可开展，建议不晚于 ${formatDate(adjustWorkday(minDevelop))} +15天` });
+            reminders.push({ icon:"📚", desc:"组织发展对象参加短期集中培训（不少于3天/24学时）", deadline:`应在确定为发展对象后及时组织，建议 ${formatDate(adjustWorkday(minDevelop))} 之后尽快完成` });
+        }
+        // 预备党员接收: 预审、支部大会
+        if(role === '支部' && currentStage === 'preparty' && developDateObj) {
+            let prePartyDeadline = addDays(developDateObj, 45);
+            reminders.push({ icon:"📑", desc:"召开支委会预审，报上级党委预审材料", deadline:`建议在 ${formatDate(adjustWorkday(addDays(developDateObj,15)))} 前完成预审` });
+            reminders.push({ icon:"🗳️", desc:"召开支部大会讨论接收预备党员，无记名投票", deadline:`预审合格后尽快召开，建议 ${formatDate(adjustWorkday(addDays(developDateObj,30)))} 前完成` });
+        }
+        // 党委视角: 审批时限
+        if(role === '党委') {
+            if(currentStage === 'preparty' && prepartyDateObj) {
+                let deadline = addDays(prepartyDateObj, 90);
+                reminders.push({ icon:"🏛️", desc:"召开党委会审批预备党员", deadline:`党支部决议后3个月内，最晚不超过6个月，建议 ${formatDate(adjustWorkday(deadline))} 前完成` });
+            }
+            if(currentStage === 'transfer' && prepartyDateObj) {
+                let transDeadline = addDays(prepartyDateObj, 365+90);
+                reminders.push({ icon:"📄", desc:"审批预备党员转正决议", deadline:`党支部上报后3个月内，建议 ${formatDate(adjustWorkday(transDeadline))} 前完成审批` });
+            }
+            if(currentStage === 'active' && activeDateObj) {
+                reminders.push({ icon:"📊", desc:"每年对入党积极分子队伍状况作分析，研究发展计划", deadline:`每年年底前完成年度分析` });
+            }
+        }
+        // 本人视角: 思想汇报提醒 + 转正申请
+        if(role === '本人') {
+            if(currentStage === 'active' && activeDateObj) {
+                let nextReport = getNextQuarterReport(activeDateObj, new Date());
+                if(nextReport) reminders.push({ icon:"✍️", desc:"提交季度思想汇报", deadline:`下次汇报截止日期：${formatDate(nextReport)} 前（每季度至少1篇）` });
+                else reminders.push({ icon:"✍️", desc:"每季度提交思想汇报", deadline:`请参考下方思想汇报计划表按时提交` });
+            }
+            if(currentStage === 'preparty' && prepartyDateObj) {
+                let transferApply = new Date(prepartyDateObj); transferApply.setFullYear(transferApply.getFullYear()+1); transferApply.setDate(transferApply.getDate()-7);
+                reminders.push({ icon:"📨", desc:"预备期满前一周，主动向党支部提交书面转正申请", deadline:`建议在 ${formatDate(adjustWorkday(transferApply))} 左右提交` });
+            }
+            if(currentStage === 'develop' && developDateObj) {
+                reminders.push({ icon:"🎓", desc:"配合政治审查，如实提供情况，参加集中培训", deadline:`列为发展对象后尽快配合完成` });
+            }
+        }
+        // 支部提醒: 预备党员转正大会
+        if(role === '支部' && currentStage === 'transfer' && prepartyDateObj) {
+            let due = new Date(prepartyDateObj); due.setFullYear(due.getFullYear()+1);
+            reminders.push({ icon:"📆", desc:"收到转正申请后，召开支部大会讨论转正", deadline:`预备期满后及时召开，建议 ${formatDate(adjustWorkday(due))} 后一个月内完成` });
+        }
+        // 去重简化: 仅保留前6个最重要的
+        return reminders.slice(0,8);
+    }
+
+    function getNextQuarterReport(activeDate, today) {
+        if(!activeDate) return null;
+        let start = new Date(activeDate);
+        let quarters = [[1,15],[4,15],[7,15],[10,15]];
+        let year = today.getFullYear();
+        for(let y=start.getFullYear(); y<=year+1; y++) {
+            for(let [m,day] of quarters) {
+                let cand = new Date(y, m-1, day);
+                if(cand >= start && cand > today) return adjustWorkday(cand);
+            }
+        }
+        return null;
+    }
+
+    // 生成思想汇报计划(复用之前逻辑)
+    function generateReportPlan(activeDate, endDate) {
+        if(!activeDate) return [];
+        let reports=[], start=new Date(activeDate), end=new Date(endDate);
+        let year=start.getFullYear();
+        let quarters=[[1,15],[4,15],[7,15],[10,15]];
+        for(let y=year; y<=end.getFullYear()+1; y++) {
+            for(let [m,day] of quarters) {
+                let cand=new Date(y, m-1, day);
+                if(cand>=start && cand<=end) reports.push(adjustWorkday(cand));
+            }
+        }
+        reports.sort((a,b)=>a-b);
+        let uniq=[],last='';
+        for(let d of reports){ let ds=formatDate(d); if(ds!==last) { uniq.push(d); last=ds; } }
+        return uniq;
+    }
+
+    // 严格校验 (同前)
+    function validateDates(applyDateObj, activeDateObj, developDateObj, prepartyDateObj, currentStage) {
+        if(!applyDateObj) return { valid:false, errorMsg:"❌ 申请入党时间为必填项。" };
+        if(activeDateObj && activeDateObj<=applyDateObj) return { valid:false, errorMsg:"❌ 积极分子时间必须晚于申请入党时间。" };
+        if(activeDateObj) { let min=new Date(applyDateObj); min.setMonth(min.getMonth()+6); if(activeDateObj<min) return { valid:false, errorMsg:`❌ 积极分子时间错误：必须在申请入党满6个月之后（至少${formatDate(min)}）。` }; }
+        if(developDateObj) { if(!activeDateObj) return { valid:false, errorMsg:"❌ 发展对象时间填写后必须填写积极分子时间。" }; let min=new Date(activeDateObj); min.setFullYear(min.getFullYear()+1); if(developDateObj<min) return { valid:false, errorMsg:`❌ 发展对象时间错误：必须在积极分子满1年之后（至少${formatDate(min)}）。` }; }
+        if(prepartyDateObj) { if(!activeDateObj) return { valid:false, errorMsg:"❌ 预备党员阶段需要积极分子时间。" }; if(developDateObj) { let min=new Date(developDateObj); min.setMonth(min.getMonth()+1); if(prepartyDateObj<min) return { valid:false, errorMsg:`❌ 预备党员接收时间与发展对象间隔过短（至少1个月），应晚于${formatDate(min)}。` }; } else { let min=new Date(activeDateObj); min.setFullYear(min.getFullYear()+1); min.setMonth(min.getMonth()+1); if(prepartyDateObj<min) return { valid:false, errorMsg:`❌ 预备党员接收时间过早，建议至少${formatDate(min)}之后。` }; } }
+        if(currentStage==='develop' && !activeDateObj) return { valid:false, errorMsg:"❌ 当前阶段为发展对象，必须填写积极分子时间。" };
+        if(currentStage==='preparty' && !prepartyDateObj) return { valid:false, errorMsg:"❌ 预备党员阶段必须填写预备党员接收时间。" };
+        if(currentStage==='transfer') { if(!prepartyDateObj) return { valid:false, errorMsg:"❌ 转正后阶段必须填写预备党员接收时间。" }; let trans=new Date(prepartyDateObj); trans.setFullYear(trans.getFullYear()+1); if(new Date()<trans) return { valid:false, errorMsg:`❌ 预备党员尚未满一年，转正日期为${formatDate(trans)}，请修改阶段。` }; }
+        return { valid:true, errorMsg:null };
+    }
+
+    function computeNodeStatus(applyDateObj, activeDateObj, developDateObj, prepartyDateObj, currentStage) {
+        let nodes=[ {key:"apply",name:"申请入党",date:applyDateObj,order:0},{key:"active",name:"积极分子",date:activeDateObj,order:1},{key:"develop",name:"发展对象",date:developDateObj,order:2},{key:"preparty",name:"预备党员",date:prepartyDateObj,order:3},{key:"transfer",name:"转正/期满",date:prepartyDateObj?new Date(prepartyDateObj.getFullYear()+1,prepartyDateObj.getMonth(),prepartyDateObj.getDate()):null,order:4} ];
+        return nodes.map(node=>{ let display=node.date?formatDate(node.date):null, status="pending", idx=stageOrder.indexOf(currentStage); if(node.order<idx) status="completed"; else if(node.order===idx) status="current"; if(node.date && node.order<=idx) status="completed"; if(node.key==="transfer" && currentStage==="transfer") status="completed"; if(!display && node.key==="active" && applyDateObj){ let sug=new Date(applyDateObj); sug.setMonth(sug.getMonth()+6); display=formatDate(sug)+" (建议)"; } if(!display && node.key==="develop" && activeDateObj){ let sug=new Date(activeDateObj); sug.setFullYear(sug.getFullYear()+1); display=formatDate(sug)+" (建议)"; } if(!display) display="待定"; return {...node,displayDate:display,status}; });
+    }
+
+    function renderTimeline(applyDateObj, activeDateObj, developDateObj, prepartyDateObj, currentStage) {
+        let nodes=computeNodeStatus(applyDateObj, activeDateObj, developDateObj, prepartyDateObj, currentStage);
+        document.getElementById('flowStepsContainer').innerHTML=nodes.map(n=>`<div class="step-node ${n.status}"><div class="step-name">${n.name}</div><div class="step-date">${n.displayDate}</div></div>`).join('');
+    }
+
+    function filterDutyByStage(list, cur){ let map={ apply:["一、申请入党"], active:["一、申请入党","二、入党积极分子培养教育"], develop:["一、申请入党","二、入党积极分子培养教育","三、发展对象考察"], preparty:["一、申请入党","二、入党积极分子培养教育","三、发展对象考察","四、预备党员接收"], transfer:["一、申请入党","二、入党积极分子培养教育","三、发展对象考察","四、预备党员接收","五、预备党员转正"] }; let allow=map[cur]||map.transfer; return list.filter(i=>allow.includes(i.stage)); }
+    function renderTable(role,cur,apply,active,develop,preparty){ let full=role==='本人'?selfDuty:(role==='支部'?branchDuty:committeeDuty), filtered=filterDutyByStage(full,cur), nodes=computeNodeStatus(apply,active,develop,preparty,cur); let html=`<table class="responsibility-table"><thead><tr><th>核心阶段</th><th>时间要求</th><th>关键动作</th><th>自查状态</th></tr></thead><tbody>`; filtered.forEach(item=>{ let sk=""; if(item.stage.includes("申请入党")) sk="apply"; else if(item.stage.includes("积极分子")) sk="active"; else if(item.stage.includes("发展对象")) sk="develop"; else if(item.stage.includes("预备党员接收")) sk="preparty"; else if(item.stage.includes("预备党员转正")) sk="transfer"; let node=nodes.find(n=>n.key===sk); let statusText=""; if(node){ if(node.status==="completed") statusText='<span class="status-badge status-done">✓ 已完成</span>'; else if(node.status==="current") statusText='<span class="status-badge status-todo">● 当前阶段</span>'; else statusText='<span class="status-badge">⏳ 未到达</span>'; if(node.displayDate && !node.displayDate.includes("待定")) statusText+=`<div style="font-size:0.7rem;">📅 ${node.displayDate}</div>`; } html+=`<tr><td><strong>${item.stage}</strong></td><td>${item.timeNode}</td><td>${item.action}</td><td>${statusText}</td></tr>`; }); html+=`</tbody></table>`; return html; }
+
+    function renderReportPlanUI(role, currentStage, activeDateObj, developDateObj, today){
+        let div=document.getElementById('reportArea');
+        if(role!=='本人' || (currentStage!=='active' && currentStage!=='develop')){ div.style.display='none'; return; }
+        if(!activeDateObj){ div.style.display='block'; document.getElementById('reportListContainer').innerHTML='<div class="empty-report">请填写积极分子确定时间，以便生成思想汇报计划。</div>'; return; }
+        let end=currentStage==='active'?today:(developDateObj?developDateObj:today);
+        let reports=generateReportPlan(activeDateObj, end);
+        if(reports.length===0) document.getElementById('reportListContainer').innerHTML='<div class="empty-report">暂无思想汇报计划</div>';
+        else{
+            let html=''; reports.forEach((d,idx)=>{ let w=['周日','周一','周二','周三','周四','周五','周六'][d.getDay()]; html+=`<div class="report-item"><span class="report-date">📅 ${formatDate(d)} (${w})</span><span class="report-note">第${idx+1}季度 · 建议提交</span></div>`; });
+            document.getElementById('reportListContainer').innerHTML=html;
+        }
+        div.style.display='block';
+    }
+
+    function renderReminders(role, currentStage, apply, active, develop, preparty){
+        let reminders=generateReminders(role, currentStage, apply, active, develop, preparty);
+        let container=document.getElementById('reminderListContainer');
+        let area=document.getElementById('reminderArea');
+        if(!reminders.length){ area.style.display='none'; return; }
+        let html=''; reminders.forEach(r=>{ html+=`<div class="reminder-item"><div class="reminder-icon">${r.icon}</div><div class="reminder-content"><div class="reminder-desc">${r.desc}</div><div class="reminder-deadline">⏱️ ${r.deadline}</div></div></div>`; });
+        container.innerHTML=html;
+        area.style.display='block';
+    }
+
+    function toggleDateFieldsByStage(stage){
+        document.getElementById('activeDateGroup').style.display=(stage!=='apply')?'flex':'none';
+        document.getElementById('developDateGroup').style.display=(stage==='develop'||stage==='preparty'||stage==='transfer')?'flex':'none';
+        document.getElementById('prepartyDateGroup').style.display=(stage==='preparty'||stage==='transfer')?'flex':'none';
+    }
+
+    function refresh(){
+        let userName=document.getElementById('userName').value.trim()||"同志";
+        let currentStage=document.getElementById('currentStage').value;
+        let applyDateStr=document.getElementById('applyDate').value;
+        let activeDateStr=document.getElementById('activeDate').value;
+        let developDateStr=document.getElementById('developDate').value;
+        let prepartyDateStr=document.getElementById('prepartyDate').value;
+        let role=document.getElementById('roleSelect').value;
+        let applyDateObj=parseDate(applyDateStr), activeDateObj=activeDateStr?parseDate(activeDateStr):null, developDateObj=developDateStr?parseDate(developDateStr):null, prepartyDateObj=prepartyDateStr?parseDate(prepartyDateStr):null;
+        let today=new Date();
+        let validation=validateDates(applyDateObj,activeDateObj,developDateObj,prepartyDateObj,currentStage);
+        let errorDiv=document.getElementById('errorContainer');
+        if(!validation.valid){ errorDiv.style.display='block'; errorDiv.innerHTML=validation.errorMsg; document.getElementById('flowStepsContainer').innerHTML='<div class="info-placeholder">时间逻辑错误，请修正后查看</div>'; document.getElementById('tableContainer').innerHTML='<div class="info-placeholder">⚠️ 由于时间冲突，责任清单暂不可导出。</div>'; document.getElementById('reminderArea').style.display='none'; document.getElementById('reportArea').style.display='none'; return; }
+        errorDiv.style.display='none';
+        renderTimeline(applyDateObj,activeDateObj,developDateObj,prepartyDateObj,currentStage);
+        document.getElementById('tableContainer').innerHTML=renderTable(role,currentStage,applyDateObj,activeDateObj,developDateObj,prepartyDateObj);
+        renderReportPlanUI(role,currentStage,activeDateObj,developDateObj,today);
+        renderReminders(role,currentStage,applyDateObj,activeDateObj,developDateObj,prepartyDateObj);
+        document.querySelector('.flow-title span').innerHTML=`📅 ${userName} · 当前阶段：${stageNames[currentStage]} · 自查时间轴`;
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click',refresh);
+    let stageSel=document.getElementById('currentStage');
+    stageSel.addEventListener('change',function(){ toggleDateFieldsByStage(this.value); refresh(); });
+    ['applyDate','activeDate','developDate','prepartyDate'].forEach(id=>{ let el=document.getElementById(id); if(el) el.addEventListener('change',refresh); });
+    document.getElementById('roleSelect').addEventListener('change',refresh);
+    window.addEventListener('DOMContentLoaded',()=>{ toggleDateFieldsByStage('active'); document.getElementById('activeDate').value='2023-10-20'; refresh(); });
+</script>
+</body>
 </html>
